@@ -1,0 +1,8 @@
+*~
+*.swp
+*.lo
+*.o
+*.a
+.depend
+tags
+*.bmp
