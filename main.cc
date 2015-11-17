@@ -24,15 +24,20 @@
 int main(int argc, char **argv)
 {
 	class libbmp *image;
+	int x, y;
 
-	if (argc < 2) return 0;
+	if (argc < 4) return 0;
+
+	sscanf(argv[2], "%d", &x);
+	sscanf(argv[3], "%d", &y);
 
 	printf("input image: %s\n", argv[1]);
 	image = new class libbmp();
 	image->open_image(argv[1]);
 	image->dump_image_info();
 
-	image->translation(0, 0);
+	printf("\ntranslation (%d, %d)\n", x, y);
+	image->translation(x, y);
 
 	return 0;
 }

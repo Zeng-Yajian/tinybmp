@@ -97,6 +97,7 @@ public:
 	int set_color_table(struct color_table *table, int size);
 
 	int get_one_line(char *buf, int line);
+	int get_one_line(char *buf, int line, int line_offset, int len);
 	int set_one_line(char *buf, int line);
 
 	int fsync(void);

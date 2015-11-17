@@ -143,6 +143,16 @@ int file_operator::get_one_line(char *buf, int line)
 	return 0;
 }
 
+int file_operator::get_one_line(char *buf, int line, int line_ffset, int len)
+{
+	int offset = tag.offset + (bytes_per_line * line) + line_ffset;
+
+	fseek(fd, offset, SEEK_SET);
+	fread((void *)buf, len, 1, fd);
+
+	return 0;
+}
+
 int file_operator::set_one_line(char *buf, int line)
 {
 	int offset = tag.offset + (bytes_per_line * line);
@@ -343,5 +353,33 @@ int libbmp::raw_to_gray(void)
 
 int libbmp::translation(int x, int y)
 {
+	int trans_width, trans_height;
+	int line_offset;
+	int line_start;
+
+	trans_width  = raw->hdr.width  - abs(x);
+	trans_height = raw->hdr.height - abs(y);
+
+	if (trans_width<=0 || trans_height<=0)
+		return -1;
+
+	line_offset = (x<0)?abs(x):0;
+	line_start  = (y<0)?0:y;
+
+	printf("start point (%d, %d)\n", line_offset, line_start);
+	printf("target image, %d x %d\n", trans_width, trans_height);
+
+/*
+	char *buf;
+	class file_operator *trans = new file_operator(*raw);
+	trans->bytes_per_line = BYTES_PER_LINE(trans_width, raw->hdr.bitcount);
+	buf = (char *)malloc(trans->bytes_per_line);
+	memset(buf, 0, trans->bytes_per_line);
+
+	for (i=0; i<trans_height; i++) {
+		raw->get_one_line(buf, line_start, line_offset, trans_width);
+		trans->set_one_line(buf, );
+	}
+*/
 	return 0;
 }
