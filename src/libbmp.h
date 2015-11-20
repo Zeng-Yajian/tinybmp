@@ -81,6 +81,7 @@ public:
 public:
 	file_operator();
 	file_operator(const file_operator& src);
+	~file_operator();
 	char *get_fname(void);
 	int init(const char* fname, const char *mode);
 	int load_image(void);

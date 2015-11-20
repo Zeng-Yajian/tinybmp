@@ -39,5 +39,6 @@ int main(int argc, char **argv)
 	printf("\ntranslation (%d, %d)\n", x, y);
 	image->translation(x, y);
 
+	delete image;
 	return 0;
 }

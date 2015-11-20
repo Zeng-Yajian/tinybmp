@@ -32,6 +32,14 @@ file_operator::file_operator(const file_operator& src)
 	bytes_per_line = src.bytes_per_line;
 }
 
+file_operator::~file_operator()
+{
+	if (fd) {
+		fflush(fd);
+		fclose(fd);
+	}
+}
+
 int file_operator::init(const char *fname, const char *mode)
 {
 	fd = fopen(fname, mode);
@@ -336,7 +344,7 @@ int libbmp::raw_to_gray(void)
 		gray->pallet.item[i].blue = color;
 	}
 
-	gray->init("dump.bmp", "wb+");
+	gray->init("gray.bmp", "wb+");
 	gray->set_image_tag(&gray->tag);
 	gray->set_image_hdr(&gray->hdr);
 	gray->set_color_table(&gray->pallet, gray->hdr.bitcount);
@@ -348,6 +356,7 @@ int libbmp::raw_to_gray(void)
 	}
 
 	free(p);
+	delete gray;
 	return 0;
 }
 
@@ -366,20 +375,27 @@ int libbmp::translation(int x, int y)
 	line_offset = (x<0)?abs(x):0;
 	line_start  = (y<0)?0:y;
 
-	printf("start point (%d, %d)\n", line_offset, line_start);
-	printf("target image, %d x %d\n", trans_width, trans_height);
-
-/*
-	char *buf;
 	class file_operator *trans = new file_operator(*raw);
+	trans->hdr.width = trans_width;
+	trans->hdr.height = trans_height;
 	trans->bytes_per_line = BYTES_PER_LINE(trans_width, raw->hdr.bitcount);
-	buf = (char *)malloc(trans->bytes_per_line);
+	trans->hdr.image_size = trans->bytes_per_line * trans->hdr.height;
+	trans->tag.size = trans->hdr.image_size + trans->tag.offset;
+
+	trans->init("translation.bmp", "wb+");
+	trans->set_image_tag(&trans->tag);
+	trans->set_image_hdr(&trans->hdr);
+	trans->set_color_table(&trans->pallet, trans->hdr.bitcount);
+
+	char *buf = (char *)malloc(trans->bytes_per_line);
 	memset(buf, 0, trans->bytes_per_line);
 
-	for (i=0; i<trans_height; i++) {
-		raw->get_one_line(buf, line_start, line_offset, trans_width);
-		trans->set_one_line(buf, );
+	for (int i=0; i<trans_height; i++) {
+		raw->get_one_line(buf, line_start++, line_offset, trans_width);
+		trans->set_one_line(buf, i);
 	}
-*/
+
+	free(buf);
+	delete trans;
 	return 0;
 }
